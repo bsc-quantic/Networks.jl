@@ -36,87 +36,11 @@ function tag_at_edge end
 
 # mutating methods
 function tag_vertex! end
-function tag_vertex_inner! end
-
 function tag_edge! end
-function tag_edge_inner! end
-
 function untag_vertex! end
-function untag_vertex_inner! end
-
 function untag_edge! end
-function untag_edge_inner! end
-
 function replace_vertex_tag! end
-function replace_vertex_tag_inner! end
-
 function replace_edge_tag! end
-function replace_edge_tag_inner! end
-
-# effects
-"""
-    TagVertexEffect{Tag,Vertex} <: Effect
-
-Represents the effect of setting a tag on a vertex.
-"""
-struct TagVertexEffect{T,V} <: Effect
-    tag::T
-    obj::V
-end
-
-"""
-    TagEdgeEffect{Tag,Edge} <: Effect
-
-Represents the effect of setting a tag on an edge.
-"""
-struct TagEdgeEffect{T,E} <: Effect
-    tag::T
-    obj::E
-end
-
-const TagEffect{T,O} = Union{TagVertexEffect{T,O},TagEdgeEffect{T,O}}
-
-"""
-    UntagVertexEffect{Tag} <: Effect
-
-Represents the effect of removing a tag from a vertex.
-"""
-struct UntagVertexEffect{T} <: Effect
-    tag::T
-end
-
-"""
-    UntagEdgeEffect{Tag} <: Effect
-
-Represents the effect of removing a tag from an edge.
-"""
-struct UntagEdgeEffect{T} <: Effect
-    tag::T
-end
-
-const UntagEffect{T} = Union{UntagVertexEffect{T},UntagEdgeEffect{T}}
-
-"""
-    ReplaceVertexTagEffect{New,Old} <: Effect
-
-Represents the effect of replacing a vertex tag `Old` with a new tag `New`.
-"""
-struct ReplaceVertexTagEffect{New,Old} <: Effect
-    new::New
-    old::Old
-end
-
-"""
-    ReplaceEdgeTagEffect{New,Old} <: Effect
-
-Represents the effect of replacing an edge tag `Old` with a new tag `New`.
-"""
-struct ReplaceEdgeTagEffect{New,Old} <: Effect
-    new::New
-    old::Old
-end
-
-const ReplaceTagEffect{New,Old} = Union{ReplaceVertexTagEffect{New,Old},ReplaceEdgeTagEffect{New,Old}}
 
 # implementation
 ## TODO `tags`
@@ -179,95 +103,31 @@ tag_at_edge(graph, edge, ::DelegateToField) = tag_at_edge(delegator(Taggable(), 
 tag_at_edge(graph, edge, ::DontDelegate) = throw(MethodError(tag_at_edge, (graph, edge)))
 
 ## `tag_vertex!`
-function tag_vertex!(graph, vertex, tag)
-    checkeffect(graph, TagVertexEffect(tag, vertex))
-    tag_vertex_inner!(graph, vertex, tag)
-    handle!(graph, TagVertexEffect(tag, vertex))
-    return graph
-end
-
-## `tag_vertex_inner!`
-tag_vertex_inner!(graph, vertex, tag) = tag_vertex_inner!(graph, vertex, tag, DelegatorTrait(Taggable(), graph))
-tag_vertex_inner!(graph, vertex, tag, ::DelegateToField) = tag_vertex_inner!(delegator(Taggable(), graph), vertex, tag)
-tag_vertex_inner!(graph, vertex, tag, ::DontDelegate) = throw(MethodError(tag_vertex_inner!, (graph, vertex, tag)))
+tag_vertex!(graph, vertex, tag) = tag_vertex!(graph, vertex, tag, DelegatorTrait(Taggable(), graph))
+tag_vertex!(graph, vertex, tag, ::DelegateToField) = tag_vertex!(delegator(Taggable(), graph), vertex, tag)
+tag_vertex!(graph, vertex, tag, ::DontDelegate) = throw(MethodError(tag_vertex!, (graph, vertex, tag)))
 
 ## `tag_edge!`
-function tag_edge!(graph, edge, tag)
-    checkeffect(graph, TagEdgeEffect(tag, edge))
-    tag_edge_inner!(graph, edge, tag)
-    handle!(graph, TagEdgeEffect(tag, edge))
-    return graph
-end
-
-## `tag_edge_inner!`
-tag_edge_inner!(graph, edge, tag) = tag_edge_inner!(graph, edge, tag, DelegatorTrait(Taggable(), graph))
-tag_edge_inner!(graph, edge, tag, ::DelegateToField) = tag_edge_inner!(delegator(Taggable(), graph), edge, tag)
-tag_edge_inner!(graph, edge, tag, ::DontDelegate) = throw(MethodError(tag_edge_inner!, (graph, edge, tag)))
+tag_edge!(graph, edge, tag) = tag_edge!(graph, edge, tag, DelegatorTrait(Taggable(), graph))
+tag_edge!(graph, edge, tag, ::DelegateToField) = tag_edge!(delegator(Taggable(), graph), edge, tag)
+tag_edge!(graph, edge, tag, ::DontDelegate) = throw(MethodError(tag_edge!, (graph, edge, tag)))
 
 ## `untag_vertex!`
-function untag_vertex!(graph, tag)
-    checkeffect(graph, UntagVertexEffect(tag))
-    untag_vertex_inner!(graph, tag)
-    handle!(graph, UntagVertexEffect(tag))
-    return graph
-end
-
-## `untag_vertex_inner!`
-untag_vertex_inner!(graph, tag) = untag_vertex_inner!(graph, tag, DelegatorTrait(Taggable(), graph))
-untag_vertex_inner!(graph, tag, ::DelegateToField) = untag_vertex_inner!(delegator(Taggable(), graph), tag)
-untag_vertex_inner!(graph, tag, ::DontDelegate) = throw(MethodError(untag_vertex_inner!, (graph, tag)))
+untag_vertex!(graph, tag) = untag_vertex!(graph, tag, DelegatorTrait(Taggable(), graph))
+untag_vertex!(graph, tag, ::DelegateToField) = untag_vertex!(delegator(Taggable(), graph), tag)
+untag_vertex!(graph, tag, ::DontDelegate) = throw(MethodError(untag_vertex!, (graph, tag)))
 
 ## `untag_edge!`
-function untag_edge!(graph, tag)
-    checkeffect(graph, UntagEdgeEffect(tag))
-    untag_edge_inner!(graph, tag)
-    handle!(graph, UntagEdgeEffect(tag))
-    return graph
-end
-
-## `untag_edge_inner!`
-untag_edge_inner!(graph, tag) = untag_edge_inner!(graph, tag, DelegatorTrait(Taggable(), graph))
-untag_edge_inner!(graph, tag, ::DelegateToField) = untag_edge_inner!(delegator(Taggable(), graph), tag)
-untag_edge_inner!(graph, tag, ::DontDelegate) = throw(MethodError(untag_edge_inner!, (graph, tag)))
+untag_edge!(graph, tag) = untag_edge!(graph, tag, DelegatorTrait(Taggable(), graph))
+untag_edge!(graph, tag, ::DelegateToField) = untag_edge!(delegator(Taggable(), graph), tag)
+untag_edge!(graph, tag, ::DontDelegate) = throw(MethodError(untag_edge!, (graph, tag)))
 
 ## `replace_vertex_tag!`
-function replace_vertex_tag!(graph, old, new)
-    checkeffect(graph, ReplaceVertexTagEffect(new, old))
-    replace_vertex_tag_inner!(graph, old, new)
-    handle!(graph, ReplaceVertexTagEffect(new, old))
-    return graph
-end
-
-## `replace_vertex_tag_inner!`
-function replace_vertex_tag_inner!(graph, old, new)
-    replace_vertex_tag_inner!(graph, old, new, DelegatorTrait(Taggable(), graph))
-end
-
-function replace_vertex_tag_inner!(graph, old, new, ::DelegateToField)
-    replace_vertex_tag_inner!(delegator(Taggable(), graph), old, new)
-end
-
-function replace_vertex_tag_inner!(graph, old, new, ::DontDelegate)
-    throw(MethodError(replace_vertex_tag_inner!, (graph, old, new)))
-end
+replace_vertex_tag!(graph, old, new) = replace_vertex_tag!(graph, old, new, DelegatorTrait(Taggable(), graph))
+replace_vertex_tag!(graph, old, new, ::DelegateToField) = replace_vertex_tag!(delegator(Taggable(), graph), old, new)
+replace_vertex_tag!(graph, old, new, ::DontDelegate) = throw(MethodError(replace_vertex_tag!, (graph, old, new)))
 
 ## `replace_edge_tag!`
-function replace_edge_tag!(graph, old, new)
-    checkeffect(graph, ReplaceEdgeTagEffect(new, old))
-    replace_edge_tag_inner!(graph, old, new)
-    handle!(graph, ReplaceEdgeTagEffect(new, old))
-    return graph
-end
-
-## `replace_edge_tag_inner!`
-function replace_edge_tag_inner!(graph, old, new)
-    replace_edge_tag_inner!(graph, old, new, DelegatorTrait(Taggable(), graph))
-end
-
-function replace_edge_tag_inner!(graph, old, new, ::DelegateToField)
-    replace_edge_tag_inner!(delegator(Taggable(), graph), old, new)
-end
-
-function replace_edge_tag_inner!(graph, old, new, ::DontDelegate)
-    throw(MethodError(replace_edge_tag_inner!, (graph, old, new)))
-end
+replace_edge_tag!(graph, old, new) = replace_edge_tag!(graph, old, new, DelegatorTrait(Taggable(), graph))
+replace_edge_tag!(graph, old, new, ::DelegateToField) = replace_edge_tag!(delegator(Taggable(), graph), old, new)
+replace_edge_tag!(graph, old, new, ::DontDelegate) = throw(MethodError(replace_edge_tag!, (graph, old, new)))

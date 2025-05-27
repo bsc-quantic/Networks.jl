@@ -26,31 +26,13 @@ function hasattr_vertex end
 function hasattr_edge end
 
 # mutating methods
-function setattr_global_inner! end
-function setattr_vertex_inner! end
-function setattr_edge_inner! end
-
 function setattr_global! end
 function setattr_vertex! end
 function setattr_edge! end
 
-# effects
-struct SetAttrGlobal{T} <: Effect
-    key::Symbol
-    value::T
-end
-
-struct SetAttrVertex{V,T} <: Effect
-    vertex::V
-    key::Symbol
-    value::T
-end
-
-struct SetAttrEdge{E,T} <: Effect
-    edge::E
-    key::Symbol
-    value::T
-end
+function delattr_global! end
+function delattr_vertex! end
+function delattr_edge! end
 
 # implementation
 ## `attrs`
@@ -140,81 +122,38 @@ function hasattr_edge(tn, edge, key, ::DontDelegate)
     return haskey(attrs_edge(tn, edge), key)
 end
 
-## `setattr_global_inner!`
-setattr_global_inner!(tn, key, value) = setattr_global_inner!(tn, key, value, delegates(Attributeable(), tn))
-function setattr_global_inner!(tn, key, value, ::DelegateToField)
-    setattr_global_inner!(delegate(Attributeable(), tn), key, value)
-end
-setattr_global_inner!(tn, key, value, ::DontDelegate) = throw(MethodError(setattr_global_inner!, (tn, key, value)))
-
-## `setattr_vertex_inner!`
-function setattr_vertex_inner!(tn, vertex, key, value)
-    setattr_vertex_inner!(tn, vertex, key, value, delegates(Attributeable(), tn))
-end
-function setattr_vertex_inner!(tn, vertex, key, value, ::DelegateToField)
-    setattr_vertex_inner!(delegate(Attributeable(), tn), vertex, key, value)
-end
-function setattr_vertex_inner!(tn, vertex, key, value, ::DontDelegate)
-    throw(MethodError(setattr_vertex_inner!, (tn, vertex, key, value)))
-end
-
-## `setattr_edge_inner!`
-setattr_edge_inner!(tn, edge, key, value) = setattr_edge_inner!(tn, edge, key, value, delegates(Attributeable(), tn))
-function setattr_edge_inner!(tn, edge, key, value, ::DelegateToField)
-    setattr_edge_inner!(delegate(Attributeable(), tn), edge, key, value)
-end
-function setattr_edge_inner!(tn, edge, key, value, ::DontDelegate)
-    throw(MethodError(setattr_edge_inner!, (tn, edge, key, value)))
-end
-
 ## `setattr_global!`
-function setattr_global!(tn, key, value)
-    checkeffect(tn, SetAttrGlobal(key, value))
-    setattr_global_inner!(tn, key, value)
-    handle!(tn, SetAttrGlobal(key, value))
-    return tn
-end
-
-checkeffect(tn, e::SetAttrGlobal) = checkeffect(tn, e, delegates(Attributeable(), tn))
-checkeffect(tn, e::SetAttrGlobal, ::DelegateToField) = checkeffect(delegate(Attributeable(), tn), e)
-checkeffect(_, e::SetAttrGlobal, ::DontDelegate) = nothing
-
-handle!(tn, e::SetAttrGlobal) = handle!(tn, e, delegates(Attributeable(), tn))
-handle!(tn, e::SetAttrGlobal, ::DelegateToField) = handle!(delegate(Attributeable(), tn), e)
-handle!(_, e::SetAttrGlobal, ::DontDelegate) = nothing
+setattr_global!(tn, key, value) = setattr_global!(tn, key, value, delegates(Attributeable(), tn))
+setattr_global!(tn, key, value, ::DelegateToField) = setattr_global!(delegate(Attributeable(), tn), key, value)
+setattr_global!(tn, key, value, ::DontDelegate) = throw(MethodError(setattr_global!, (tn, key, value)))
 
 ## `setattr_vertex!`
-function setattr_vertex!(tn, vertex, key, value)
-    checkeffect(tn, SetAttrVertex(vertex, key, value))
-    setattr_vertex_inner!(tn, vertex, key, value)
-    handle!(tn, SetAttrVertex(vertex, key, value))
-    return tn
+# TODO check if the vertex exists
+#   hasvertex(tn, e.vertex) || throw(ArgumentError("Vertex $(e.vertex) not found in network"))
+setattr_vertex!(tn, vertex, key, value) = setattr_vertex!(tn, vertex, key, value, delegates(Attributeable(), tn))
+function setattr_vertex!(tn, vertex, key, value, ::DelegateToField)
+    setattr_vertex!(delegate(Attributeable(), tn), vertex, key, value)
 end
-
-checkeffect(tn, e::SetAttrVertex) = checkeffect(tn, e, delegates(Attributeable(), tn))
-checkeffect(tn, e::SetAttrVertex, ::DelegateToField) = checkeffect(delegate(Attributeable(), tn), e)
-function checkeffect(tn, e::SetAttrVertex, ::DontDelegate)
-    hasvertex(tn, e.vertex) || throw(ArgumentError("Vertex $(e.vertex) not found in network"))
-end
-
-handle!(tn, e::SetAttrVertex) = handle!(tn, e, delegates(Attributeable(), tn))
-handle!(tn, e::SetAttrVertex, ::DelegateToField) = handle!(delegate(Attributeable(), tn), e)
-handle!(_, e::SetAttrVertex, ::DontDelegate) = nothing
+setattr_vertex!(tn, vertex, key, value, ::DontDelegate) = throw(MethodError(setattr_vertex!, (tn, vertex, key, value)))
 
 ## `setattr_edge!`
-function setattr_edge!(tn, edge, key, value)
-    checkeffect(tn, SetAttrEdge(edge, key, value))
-    setattr_edge_inner!(tn, edge, key, value)
-    handle!(tn, SetAttrEdge(edge, key, value))
-    return tn
-end
+# TODO check if the edge exists
+#   hasedge(tn, e.edge) || throw(ArgumentError("Edge $(e.edge) not found in network"))
+setattr_edge!(tn, edge, key, value) = setattr_edge!(tn, edge, key, value, delegates(Attributeable(), tn))
+setattr_edge!(tn, edge, key, value, ::DelegateToField) = setattr_edge!(delegate(Attributeable(), tn), edge, key, value)
+setattr_edge!(tn, edge, key, value, ::DontDelegate) = throw(MethodError(setattr_edge!, (tn, edge, key, value)))
 
-checkeffect(tn, e::SetAttrEdge) = checkeffect(tn, e, delegates(Attributeable(), tn))
-checkeffect(tn, e::SetAttrEdge, ::DelegateToField) = checkeffect(delegate(Attributeable(), tn), e)
-function checkeffect(tn, e::SetAttrEdge, ::DontDelegate)
-    hasedge(tn, e.edge) || throw(ArgumentError("Edge $(e.edge) not found in network"))
-end
+## `delattr_global!`
+delattr_global!(tn, key) = delattr_global!(tn, key, delegates(Attributeable(), tn))
+delattr_global!(tn, key, ::DelegateToField) = delattr_global!(delegate(Attributeable(), tn), key)
+delattr_global!(tn, key, ::DontDelegate) = throw(MethodError(delattr_global!, (tn, key)))
 
-handle!(tn, e::SetAttrEdge) = handle!(tn, e, delegates(Attributeable(), tn))
-handle!(tn, e::SetAttrEdge, ::DelegateToField) = handle!(delegate(Attributeable(), tn), e)
-handle!(_, e::SetAttrEdge, ::DontDelegate) = nothing
+## `delattr_vertex!`
+delattr_vertex!(tn, vertex, key) = delattr_vertex!(tn, vertex, key, delegates(Attributeable(), tn))
+delattr_vertex!(tn, vertex, key, ::DelegateToField) = delattr_vertex!(delegate(Attributeable(), tn), vertex, key)
+delattr_vertex!(tn, vertex, key, ::DontDelegate) = throw(MethodError(delattr_vertex!, (tn, vertex, key)))
+
+## `delattr_edge!`
+delattr_edge!(tn, edge, key) = delattr_edge!(tn, edge, key, delegates(Attributeable(), tn))
+delattr_edge!(tn, edge, key, ::DelegateToField) = delattr_edge!(delegate(Attributeable(), tn), edge, key)
+delattr_edge!(tn, edge, key, ::DontDelegate) = throw(MethodError(delattr_edge!, (tn, edge, key)))

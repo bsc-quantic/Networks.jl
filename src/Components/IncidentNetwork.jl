@@ -1,4 +1,6 @@
+using DelegatorTraits
 
+# TODO parameterize `EdgePersistenceTrait` to allow for different edge persistence strategies
 struct IncidentNetwork{V,E} <: AbstractNetwork
     vertexmap::Dict{V,Set{E}}
     edgemap::Dict{E,Set{V}}
@@ -18,7 +20,9 @@ function Base.copy(graph::IncidentNetwork{V,E}) where {V,E}
 end
 
 # Network implementation
-ImplementorTrait(::Network, graph::IncidentNetwork) = Implements()
+ImplementorTrait(::Network, ::IncidentNetwork) = Implements()
+
+# TODO parameterize `EdgePersistenceTrait` to allow for different edge persistence strategies
 EdgePersistenceTrait(::IncidentNetwork) = PersistEdges()
 
 vertices(graph::IncidentNetwork) = keys(graph.vertexmap)
@@ -67,18 +71,20 @@ function edges_set_hyper(graph::IncidentNetwork{V,E}) where {V,E}
     return stranded_edges
 end
 
-function addvertex_inner!(graph::IncidentNetwork{V,E}, vertex) where {V,E}
+function addvertex!(graph::IncidentNetwork{V,E}, vertex) where {V,E}
     hasvertex(graph, vertex) && return graph
     graph.vertexmap[vertex] = Set{E}()
     return graph
 end
 
-function rmvertex_inner!(graph::IncidentNetwork, vertex)
-    # isempty(vertex_incidents(graph, vertex)) || throw(ArgumentError("Vertex $vertex is incident to edges. Remove edges first."))
+# TODO parameterize `EdgePersistenceTrait` to allow for different edge persistence strategies
+function rmvertex!(graph::IncidentNetwork, vertex)
+    # isempty(vertex_incidents(graph, vertex)) || throw(ArgumentError("Vertex $vertex is incident to edges. Unlink edges first."))
+    hasvertex(graph, vertex) || throw(ArgumentError("Vertex $vertex does not exist in the graph"))
 
     # unlink vertex-edge pairs
     for edge in vertex_incidents(graph, vertex)
-        unlink_inner!(graph, vertex, edge)
+        unlink!(graph, vertex, edge)
     end
 
     # remove vertex
@@ -86,18 +92,20 @@ function rmvertex_inner!(graph::IncidentNetwork, vertex)
     return graph
 end
 
-function addedge_inner!(graph::IncidentNetwork{V,E}, edge) where {V,E}
+# TODO make special case for `edge::SimpleEdge` or so (i.e. `edge` contains information about its vertices), so it automatically links them
+function addedge!(graph::IncidentNetwork{V,E}, edge) where {V,E}
     hasedge(graph, edge) && return graph
     graph.edgemap[edge] = Set{V}()
     return graph
 end
 
-function rmedge_inner!(graph::IncidentNetwork, edge)
-    # isempty(edge_incidents(graph, edge)) || throw(ArgumentError("Edge $edge is incident to vertices. Remove vertices first."))
+function rmedge!(graph::IncidentNetwork, edge)
+    # isempty(edge_incidents(graph, edge)) || throw(ArgumentError("Edge $edge is incident to vertices. Unlink vertices first."))
+    hasedge(graph, edge) || throw(ArgumentError("Edge $edge does not exist in the graph"))
 
     # unlink edge-vertex pairs
     for vertex in edge_incidents(graph, edge)
-        unlink_inner!(graph, vertex, edge)
+        unlink!(graph, vertex, edge)
     end
 
     # remove edge
@@ -105,12 +113,12 @@ function rmedge_inner!(graph::IncidentNetwork, edge)
     return graph
 end
 
-function link_inner!(graph::IncidentNetwork, vertex, edge)
+function link!(graph::IncidentNetwork, vertex, edge)
     push!(graph.vertexmap[vertex], edge)
     push!(graph.edgemap[edge], vertex)
 end
 
-function unlink_inner!(graph::IncidentNetwork, vertex, edge)
+function unlink!(graph::IncidentNetwork, vertex, edge)
     delete!(graph.vertexmap[vertex], edge)
     delete!(graph.edgemap[edge], vertex)
 end

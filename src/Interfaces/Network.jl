@@ -60,79 +60,13 @@ function edges_set_open end
 function edges_set_hyper end
 
 # mutating methods
-function addvertex_inner! end
-function addedge_inner! end
-function rmvertex_inner! end
-function rmedge_inner! end
-function link_inner! end
-function unlink_inner! end
-
 function addvertex! end
 function addedge! end
 function rmvertex! end
 function rmedge! end
 function link! end
 function unlink! end
-
-# mutating methods with default implementation
 function prune_edges! end
-
-# effects
-"""
-    AddVertexEffect{F} <: Effect
-
-Represents the effect of adding a vertex to a graph.
-"""
-struct AddVertexEffect{V} <: Effect
-    vertex::V
-end
-
-"""
-    AddEdgeEffect{F} <: Effect
-
-Represents the effect of adding an edge to a graph.
-"""
-struct AddEdgeEffect{E} <: Effect
-    edge::E
-end
-
-"""
-    RemoveVertexEffect{F} <: Effect
-
-Represents the effect of removing a vertex from a graph.
-"""
-struct RemoveVertexEffect{V} <: Effect
-    vertex::V
-end
-
-"""
-    RemoveEdgeEffect{F} <: Effect
-
-Represents the effect of removing an edge from a graph.
-"""
-struct RemoveEdgeEffect{E} <: Effect
-    edge::E
-end
-
-"""
-    LinkEffect{F} <: Effect
-
-Represents the effect of linking a vertex to an edge in a graph.
-"""
-struct LinkEffect{V,E} <: Effect
-    vertex::V
-    edge::E
-end
-
-"""
-    UnlinkEffect{F} <: Effect
-
-Represents the effect of unlinking a vertex from an edge in a graph.
-"""
-struct UnlinkEffect{V,E} <: Effect
-    vertex::V
-    edge::E
-end
 
 # implementation
 ## `vertices`
@@ -247,192 +181,97 @@ function edges_set_hyper(graph, ::DontDelegate)
     return stranded_edges
 end
 
-## `addvertex_inner!`
-addvertex_inner!(graph, v) = addvertex_inner!(graph, v, DelegatorTrait(Network(), graph))
-addvertex_inner!(graph, v, ::DelegateToField) = addvertex_inner!(delegator(Network(), graph), v)
-addvertex_inner!(graph, v, ::DontDelegate) = throw(MethodError(addvertex_inner!, (graph, v)))
-
-## `addedge_inner!`
-addedge_inner!(graph, e) = addedge_inner!(graph, e, DelegatorTrait(Network(), graph))
-addedge_inner!(graph, e, ::DelegateToField) = addedge_inner!(delegator(Network(), graph), e)
-addedge_inner!(graph, e, ::DontDelegate) = throw(MethodError(addedge_inner!, (graph, e)))
-
-## `rmvertex_inner!`
-rmvertex_inner!(graph, v) = rmvertex_inner!(graph, v, DelegatorTrait(Network(), graph))
-rmvertex_inner!(graph, v, ::DelegateToField) = rmvertex_inner!(delegator(Network(), graph), v)
-rmvertex_inner!(graph, v, ::DontDelegate) = throw(MethodError(rmvertex_inner!, (graph, v)))
-
-## `rmedge_inner!`
-rmedge_inner!(graph, e) = rmedge_inner!(graph, e, DelegatorTrait(Network(), graph))
-rmedge_inner!(graph, e, ::DelegateToField) = rmedge_inner!(delegator(Network(), graph), e)
-rmedge_inner!(graph, e, ::DontDelegate) = throw(MethodError(rmedge_inner!, (graph, e)))
-
-## `link_inner!`
-link_inner!(graph, v, e) = link_inner!(graph, v, e, DelegatorTrait(Network(), graph))
-link_inner!(graph, v, e, ::DelegateToField) = link_inner!(delegator(Network(), graph), v, e)
-link_inner!(graph, v, e, ::DontDelegate) = throw(MethodError(link_inner!, (graph, v, e)))
-
-## `unlink_inner!`
-unlink_inner!(graph, v, e) = unlink_inner!(graph, v, e, DelegatorTrait(Network(), graph))
-unlink_inner!(graph, v, e, ::DelegateToField) = unlink_inner!(delegator(Network(), graph), v, e)
-unlink_inner!(graph, v, e, ::DontDelegate) = throw(MethodError(unlink_inner!, (graph, v, e)))
-
 ## `addvertex!`
-function addvertex!(graph, v)
-    checkeffect(graph, AddVertexEffect(v))
-    addvertex_inner!(graph, v)
-    handle!(graph, AddVertexEffect(v))
-    return graph
-end
-
-checkeffect(graph, e::AddVertexEffect) = checkeffect(graph, e, DelegatorTrait(Network(), graph))
-checkeffect(graph, e::AddVertexEffect, ::DelegateToField) = checkeffect(delegator(Network(), graph), e)
-function checkeffect(graph, e::AddVertexEffect, ::DontDelegate)
-    hasvertex(graph, e.vertex) && throw(ArgumentError("Vertex $(e.vertex) already exists in network"))
-end
-
-# by default, do nothing because no extra mapping should be defined at this level
-handle!(graph, e::AddVertexEffect) = handle!(graph, e, DelegatorTrait(Network(), graph))
-handle!(graph, e::AddVertexEffect, ::DelegateToField) = handle!(delegator(Network(), graph), e)
-handle!(graph, e::AddVertexEffect, ::DontDelegate) = nothing
+# TODO check if vertex already exists
+#   hasvertex(graph, e.vertex) && throw(ArgumentError("Vertex $(e.vertex) already exists in network"))
+addvertex!(graph, v) = addvertex!(graph, v, DelegatorTrait(Network(), graph))
+addvertex!(graph, v, ::DelegateToField) = addvertex!(delegator(Network(), graph), v)
+addvertex!(graph, v, ::DontDelegate) = throw(MethodError(addvertex!, (graph, v)))
 
 ## `addedge!`
-function addedge!(graph, e)
-    checkeffect(graph, AddEdgeEffect(e))
-    addedge_inner!(graph, e)
-    handle!(graph, AddEdgeEffect(e))
-    return graph
-end
-
-checkeffect(graph, e::AddEdgeEffect) = checkeffect(graph, e, DelegatorTrait(Network(), graph))
-checkeffect(graph, e::AddEdgeEffect, ::DelegateToField) = checkeffect(delegator(Network(), graph), e)
-function checkeffect(graph, e::AddEdgeEffect, ::DontDelegate)
-    hasedge(graph, e.edge) && throw(ArgumentError("Edge $(e.edge) already exists in network"))
-end
-
-# by default, do nothing because no extra mapping should be defined at this level
-handle!(graph, e::AddEdgeEffect) = handle!(graph, e, DelegatorTrait(Network(), graph))
-handle!(graph, e::AddEdgeEffect, ::DelegateToField) = handle!(delegator(Network(), graph), e)
-handle!(graph, e::AddEdgeEffect, ::DontDelegate) = nothing
+# TODO check if edge already exists
+#   hasedge(graph, e.edge) && throw(ArgumentError("Edge $(e.edge) already exists in network"))
+addedge!(graph, e) = addedge!(graph, e, DelegatorTrait(Network(), graph))
+addedge!(graph, e, ::DelegateToField) = addedge!(delegator(Network(), graph), e)
+addedge!(graph, e, ::DontDelegate) = throw(MethodError(addedge!, (graph, e)))
 
 ## `rmvertex!`
-rmvertex!(graph, v) = rmvertex!(graph, v, EdgePersistenceTrait(graph))
+# TODO check if vertex exists
+#   hasvertex(graph, v) || throw(ArgumentError("Vertex $(v) not found in network"))
+rmvertex!(graph, v) = rmvertex!(graph, v, DelegatorTrait(Network(), graph))
+rmvertex!(graph, v, ::DelegateToField) = rmvertex!(delegator(Network(), graph), v)
+rmvertex!(graph, v, ::DontDelegate) = throw(MethodError(rmvertex!, (graph, v)))
 
-function rmvertex!(graph, v, ::PersistEdges)
-    checkeffect(graph, RemoveVertexEffect(v))
-    rmvertex_inner!(graph, v)
+# rmvertex!(graph, v) = rmvertex!(graph, v, EdgePersistenceTrait(graph))
 
-    # TODO call `unlink!` on the vertex-edge?
-    # - needed for incidence matrix-implementations
-    # - adjacency matrix-implementations cannot process `unlink!` because overlaps with `rmedge!`
+# function rmvertex!(graph, v, ::PersistEdges)
+#     checkeffect(graph, RemoveVertexEffect(v))
+#     rmvertex_inner!(graph, v)
 
-    handle!(graph, RemoveVertexEffect(v))
-    return graph
-end
+#     # TODO call `unlink!` on the vertex-edge?
+#     # - needed for incidence matrix-implementations
+#     # - adjacency matrix-implementations cannot process `unlink!` because overlaps with `rmedge!`
 
-function rmvertex!(graph, v, ::RemoveEdges)
-    checkeffect(graph, RemoveVertexEffect(v))
+#     handle!(graph, RemoveVertexEffect(v))
+#     return graph
+# end
 
-    # trait is to remove edges on vertex removal
-    for edge in vertex_incidents(graph, v)
-        rmedge!(graph, edge)
-    end
+# function rmvertex!(graph, v, ::RemoveEdges)
+#     checkeffect(graph, RemoveVertexEffect(v))
 
-    rmvertex_inner!(graph, v)
-    handle!(graph, RemoveVertexEffect(v))
-    return graph
-end
+#     # trait is to remove edges on vertex removal
+#     for edge in vertex_incidents(graph, v)
+#         rmedge!(graph, edge)
+#     end
 
-function rmvertex!(graph, v, ::PruneEdges)
-    checkeffect(graph, RemoveVertexEffect(v))
+#     rmvertex_inner!(graph, v)
+#     handle!(graph, RemoveVertexEffect(v))
+#     return graph
+# end
 
-    # trait is to remove edges on vertex removal if that leaves them stranded
-    # (i.e. no open indices left)
-    for edge in vertex_incidents(graph, v)
-        if length(edge_incidents(graph, edge)) == 1
-            rmedge!(graph, edge)
-        end
-    end
+# function rmvertex!(graph, v, ::PruneEdges)
+#     checkeffect(graph, RemoveVertexEffect(v))
 
-    # TODO call `unlink!` on the vertex-edge?
-    # - needed for incidence matrix-implementations
-    # - adjacency matrix-implementations cannot process `unlink!` because overlaps with `rmedge!`
+#     # trait is to remove edges on vertex removal if that leaves them stranded
+#     # (i.e. no open indices left)
+#     for edge in vertex_incidents(graph, v)
+#         if length(edge_incidents(graph, edge)) == 1
+#             rmedge!(graph, edge)
+#         end
+#     end
 
-    rmvertex_inner!(graph, v)
-    handle!(graph, RemoveVertexEffect(v))
-    return graph
-end
+#     # TODO call `unlink!` on the vertex-edge?
+#     # - needed for incidence matrix-implementations
+#     # - adjacency matrix-implementations cannot process `unlink!` because overlaps with `rmedge!`
 
-checkeffect(graph, e::RemoveVertexEffect) = checkeffect(graph, e, DelegatorTrait(Network(), graph))
-checkeffect(graph, e::RemoveVertexEffect, ::DelegateToField) = checkeffect(delegator(Network(), graph), e)
-function checkeffect(graph, e::RemoveVertexEffect, ::DontDelegate)
-    hasvertex(graph, e.vertex) || throw(ArgumentError("Vertex $(e.vertex) not found in network"))
-end
-
-# by default, do nothing because no extra mapping should be defined at this level
-handle!(graph, e::RemoveVertexEffect) = handle!(graph, e, DelegatorTrait(Network(), graph))
-handle!(graph, e::RemoveVertexEffect, ::DelegateToField) = handle!(delegator(Network(), graph), e)
-handle!(graph, e::RemoveVertexEffect, ::DontDelegate) = nothing
+#     rmvertex_inner!(graph, v)
+#     handle!(graph, RemoveVertexEffect(v))
+#     return graph
+# end
 
 ## `rmedge!`
-function rmedge!(graph, e)
-    checkeffect(graph, RemoveEdgeEffect(e))
-    # TODO call `unlink!` on the edge?
-    rmedge_inner!(graph, e)
-    handle!(graph, RemoveEdgeEffect(e))
-    return graph
-end
-
-checkeffect(graph, e::RemoveEdgeEffect) = checkeffect(graph, e, DelegatorTrait(Network(), graph))
-checkeffect(graph, e::RemoveEdgeEffect, ::DelegateToField) = checkeffect(delegator(Network(), graph), e)
-function checkeffect(graph, e::RemoveEdgeEffect, ::DontDelegate)
-    hasedge(graph, e.edge) || throw(ArgumentError("Edge $(e.edge) not found in network"))
-end
-
-# by default, do nothing because no extra mapping should be defined at this level
-handle!(graph, e::RemoveEdgeEffect) = handle!(graph, e, DelegatorTrait(Network(), graph))
-handle!(graph, e::RemoveEdgeEffect, ::DelegateToField) = handle!(delegator(Network(), graph), e)
-handle!(graph, e::RemoveEdgeEffect, ::DontDelegate) = nothing
+# TODO check if edge exists
+# TODO call `unlink!` on the edge?
+#   hasedge(graph, e) || throw(ArgumentError("Edge $(e) not found in network"))
+rmedge!(graph, e) = rmedge!(graph, e, DelegatorTrait(Network(), graph))
+rmedge!(graph, e, ::DelegateToField) = rmedge!(delegator(Network(), graph), e)
+rmedge!(graph, e, ::DontDelegate) = throw(MethodError(rmedge!, (graph, e)))
 
 ## `link!`
-function link!(graph, v, e)
-    checkeffect(graph, LinkEffect(v, e))
-    link_inner!(graph, v, e)
-    handle!(graph, LinkEffect(v, e))
-    return graph
-end
+# TODO check if vertex and edge exist
+#   hasvertex(graph, e.vertex) || throw(ArgumentError("Vertex $(e.vertex) not found in network"))
+#   hasedge(graph, e.edge) || throw(ArgumentError("Edge $(e.edge) not found in network"))
+link!(graph, v, e) = link!(graph, v, e, DelegatorTrait(Network(), graph))
+link!(graph, v, e, ::DelegateToField) = link!(delegator(Network(), graph), v, e)
+link!(graph, v, e, ::DontDelegate) = throw(MethodError(link!, (graph, v, e)))
 
-checkeffect(graph, e::LinkEffect) = checkeffect(graph, e, DelegatorTrait(Network(), graph))
-checkeffect(graph, e::LinkEffect, ::DelegateToField) = checkeffect(delegator(Network(), graph), e)
-function checkeffect(graph, e::LinkEffect, ::DontDelegate)
-    hasvertex(graph, e.vertex) || throw(ArgumentError("Vertex $(e.vertex) not found in network"))
-    hasedge(graph, e.edge) || throw(ArgumentError("Edge $(e.edge) not found in network"))
-end
-
-# by default, do nothing because no extra mapping should be defined at this level
-handle!(graph, e::LinkEffect) = handle!(graph, e, DelegatorTrait(Network(), graph))
-handle!(graph, e::LinkEffect, ::DelegateToField) = handle!(delegator(Network(), graph), e)
-handle!(graph, e::LinkEffect, ::DontDelegate) = nothing
-
-## `unlink!`
-function unlink!(graph, v, e)
-    checkeffect(graph, UnlinkEffect(v, e))
-    unlink_inner!(graph, v, e)
-    handle!(graph, UnlinkEffect(v, e))
-    return graph
-end
-
-checkeffect(graph, e::UnlinkEffect) = checkeffect(graph, e, DelegatorTrait(Network(), graph))
-checkeffect(graph, e::UnlinkEffect, ::DelegateToField) = checkeffect(delegator(Network(), graph), e)
-function checkeffect(graph, e::UnlinkEffect, ::DontDelegate)
-    hasvertex(graph, e.vertex) || throw(ArgumentError("Vertex $(e.vertex) not found in network"))
-    hasedge(graph, e.edge) || throw(ArgumentError("Edge $(e.edge) not found in network"))
-end
-
-# by default, do nothing because no extra mapping should be defined at this level
-handle!(graph, e::UnlinkEffect) = handle!(graph, e, DelegatorTrait(Network(), graph))
-handle!(graph, e::UnlinkEffect, ::DelegateToField) = handle!(delegator(Network(), graph), e)
-handle!(graph, e::UnlinkEffect, ::DontDelegate) = nothing
+## `unlink!
+# TODO check if vertex and edge exist
+#   hasvertex(graph, e.vertex) || throw(ArgumentError("Vertex $(e.vertex) not found in network"))
+#   hasedge(graph, e.edge) || throw(ArgumentError("Edge $(e.edge) not found in network"))
+unlink!(graph, v, e) = unlink!(graph, v, e, DelegatorTrait(Network(), graph))
+unlink!(graph, v, e, ::DelegateToField) = unlink!(delegator(Network(), graph), v, e)
+unlink!(graph, v, e, ::DontDelegate) = throw(MethodError(unlink!, (graph, v, e)))
 
 ## `prune_edges!`
 function prune_edges!(graph)
