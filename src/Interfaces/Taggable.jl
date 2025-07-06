@@ -1,4 +1,4 @@
-struct Taggable <: Interface end
+struct Taggable{T} <: Interface end
 
 # traits
 # WARN experimental
@@ -24,6 +24,9 @@ function untag! end
 function replace_tag! end
 
 # query methods
+function vertex_at end
+function edge_at end
+
 function vertex_tags end
 function edge_tags end
 
@@ -55,6 +58,16 @@ hastag(graph, tag, ::EdgeTagKind) = has_edge_tag(graph, tag)
 ### TODO add methods based on trait instead of abstract type?
 tag_at(graph, v::AbstractVertex) = tag_at_vertex(graph, v)
 tag_at(graph, e::AbstractEdge) = tag_at_edge(graph, e)
+
+## `vertex_at`
+vertex_at(graph, tag) = vertex_at(graph, tag, DelegatorTrait(Network(), graph))
+vertex_at(graph, tag, ::DelegateToField) = vertex_at(delegator(Network(), graph), tag)
+vertex_at(graph, tag, ::DontDelegate) = throw(MethodError(vertex_at, (graph, tag)))
+
+## `edge_at`
+edge_at(graph, tag) = edge_at(graph, tag, DelegatorTrait(Network(), graph))
+edge_at(graph, tag, ::DelegateToField) = edge_at(delegator(Network(), graph), tag)
+edge_at(graph, tag, ::DontDelegate) = throw(MethodError(edge_at, (graph, tag)))
 
 ## `replace_tag!`
 replace_tag!(graph, old, new) = replace_tag!(graph, old, new, TagKind(old), TagKind(new))

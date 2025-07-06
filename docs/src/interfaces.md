@@ -24,16 +24,14 @@ A type implementing the `Network` interface must implement the following methods
 
 The following methods have a default implementation or their implementation is optional.
 
-| Method              | When should this method be defined?                  | Default definition    | Brief description                                      |
-| :------------------ | :--------------------------------------------------- | :-------------------- | :----------------------------------------------------- |
-| `vertex_type(g)`    | If your vertex type is type-stable                   | `Any`                 | Returns the type used for representing a vertex        |
-| `edge_type(g)`      | If your edge type is type-stable                     | `Any`                 | Returns the type used for representing an edge         |
-| `hasvertex(g, v)`   | If there is a more performant way                    | `v in vertices(g)`    | Returns `true` if vertex `v` is present in network `g` |
-| `hasedge(g, e)`     | If there is a more performant way                    | `e in edges(g)`       | Returns `true` if edge `e` is present in network `e`   |
-| `nvertices(g)`      | If there is a more performant way                    | `length(vertices(g))` | Returns the number of vertices present in the network  |
-| `nedges(g)`         | If there is a more performant way                    | `length(edges(g))`    | Returns the number of edges present in the network     |
-| `vertex_at(g, tag)` | If your type has some other way to refer to a vertex | _(undefined)_         | Returns the vertex related to `tag`                    |
-| `edge_at(g, tag)`   | If your type has some other way to refer to an edge  | _(undefined)_         | Returns the edge related to `tag`                      |
+| Method            | When should this method be defined? | Default definition    | Brief description                                      |
+| :---------------- | :---------------------------------- | :-------------------- | :----------------------------------------------------- |
+| `vertex_type(g)`  | If your vertex type is type-stable  | `Any`                 | Returns the type used for representing a vertex        |
+| `edge_type(g)`    | If your edge type is type-stable    | `Any`                 | Returns the type used for representing an edge         |
+| `hasvertex(g, v)` | If there is a more performant way   | `v in vertices(g)`    | Returns `true` if vertex `v` is present in network `g` |
+| `hasedge(g, e)`   | If there is a more performant way   | `e in edges(g)`       | Returns `true` if edge `e` is present in network `e`   |
+| `nvertices(g)`    | If there is a more performant way   | `length(vertices(g))` | Returns the number of vertices present in the network  |
+| `nedges(g)`       | If there is a more performant way   | `length(edges(g))`    | Returns the number of edges present in the network     |
 
 ### Mutating methods
 
@@ -55,6 +53,11 @@ The [`EdgePersistence`](@ref Networks.EdgePersistence) trait defines the behavio
 ## Taggable
 
 WIP
+
+| Required method     | Description                         |
+| :------------------ | :---------------------------------- |
+| `vertex_at(g, tag)` | Returns the vertex related to `tag` |
+| `edge_at(g, tag)`   | Returns the edge related to `tag`   |
 
 ## Attributeable
 
