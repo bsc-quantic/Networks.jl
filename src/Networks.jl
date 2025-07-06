@@ -27,4 +27,6 @@ export IncidentNetwork
 include("Components/SimpleNetwork.jl")
 export SimpleNetwork
 
+include("Algorithms/cycles.jl")
+
 end # module Networks
