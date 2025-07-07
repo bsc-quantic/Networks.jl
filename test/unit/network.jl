@@ -127,6 +127,43 @@ end
     end
 end
 
+@testset "vertex_neighbors" begin
+    g = IncidentNetwork{Symbol,Int}()
+    addvertex!(g, :a)
+    addvertex!(g, :b)
+    addvertex!(g, :c)
+    addedge!(g, 1)
+    Networks.link!(g, :a, 1)
+    Networks.link!(g, :b, 1)
+
+    @test issetequal(vertex_neighbors(g, :a), Set([:b]))
+    @test issetequal(vertex_neighbors(g, :b), Set([:a]))
+    @test isempty(vertex_neighbors(g, :c))
+end
+
+@testset "edge_neighbors" begin
+    g = IncidentNetwork{Symbol,Int}()
+    addvertex!(g, :a)
+    addvertex!(g, :b)
+    addvertex!(g, :c)
+    addvertex!(g, :d)
+
+    addedge!(g, 1)
+    Networks.link!(g, :a, 1)
+    Networks.link!(g, :b, 1)
+
+    addedge!(g, 2)
+    Networks.link!(g, :b, 2)
+    Networks.link!(g, :c, 2)
+
+    addedge!(g, 3)
+    Networks.link!(g, :d, 3)
+
+    @test issetequal(edge_neighbors(g, 1), Set([2]))
+    @test issetequal(edge_neighbors(g, 2), Set([1]))
+    @test isempty(edge_neighbors(g, 3))
+end
+
 @testset "vertex_type" begin
     @testset "$(typeof(network))" for network in [
         IncidentNetwork(fixture.vertex_map, fixture.edge_map),
