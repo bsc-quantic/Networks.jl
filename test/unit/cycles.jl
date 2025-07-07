@@ -38,7 +38,7 @@ using Networks: Vertex, Edge, link!
     link!(g, Vertex((2, 2)), Edge(7))
     link!(g, Vertex((2, 3)), Edge(7))
 
-    cycles = cycle_basis(g)
+    cycles = Networks.cycle_basis(g)
 
     @test length(cycles) == 2
     @test issetequal(cycles[1], Vertex.([(1, 1), (1, 2), (2, 2), (2, 1)]))
