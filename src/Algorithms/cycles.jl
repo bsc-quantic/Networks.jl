@@ -6,14 +6,14 @@ function cycle_basis(g, root=nothing)
     # shortcut
     nvertices(g) == 0 && return cycles
     gnodes = Set(vertices(g))
-    r::V = isnothing(root) ? pop!(gnodes) : root
+    r::T = isnothing(root) ? pop!(gnodes) : root
 
     while true
         stack = [r]
         pred = Dict(r => r)
-        keys_pred = Set(r)
+        keys_pred = Set([r])
         used = Dict(r => T[])
-        keys_used = Set(r)
+        keys_used = Set([r])
         while !isempty(stack)
             z = pop!(stack)
             zused = used[z]
