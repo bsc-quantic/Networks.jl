@@ -1,4 +1,4 @@
-struct SimpleEdge{T} <: AbstractEdge
+struct SimpleEdge{T<:Integer} <: AbstractEdge
     v1::T
     v2::T
 
@@ -10,6 +10,11 @@ end
 
 A network represented as an adjacency list.
 It is the translation of `SimpleGraph` from Graphs.jl to the [`Network`](@ref) interface.
+
+!!! warning
+
+    This is mostly a example of compatibility with the Graphs.jl interface, but shouldn't be used as
+    `Graphs.SimpleGraph` has proven to be problematic.
 """
 mutable struct SimpleNetwork{T<:Integer} <: AbstractNetwork
     fadjlist::Vector{Vector{T}}
@@ -30,11 +35,32 @@ edges(g::SimpleNetwork) = SimpleEdgeIter(g)
 all_vertices(g::SimpleNetwork) = 1:length(g.fadjlist)
 all_edges(g::SimpleNetwork) = SimpleEdgeIter(g)
 
-edge_incidents(g::SimpleNetwork, e::SimpleEdge) = [e.v1, e.v2]
-vertex_incidents(g::SimpleNetwork, v) = g.fadjlist[v]
+edge_incidents(::SimpleNetwork, e::SimpleEdge) = [e.v1, e.v2]
+vertex_incidents(g::SimpleNetwork, v) = map(dst -> SimpleEdge(v, dst), g.fadjlist[v])
 
-vertex_type(g::SimpleNetwork{T}) where {T} = T
-edge_type(g::SimpleNetwork{T}) where {T} = SimpleEdge{T}
+vertex_neighbors(g::SimpleNetwork, v) = g.fadjlist[v]
+function edge_neighbors(g::SimpleNetwork, e::SimpleEdge)
+    neigh_v1 = vertex_neighbors(g, e.v1)
+    neigh_v2 = vertex_neighbors(g, e.v2)
+    neighbors = Set{edge_type(g)}()
+
+    for v in neigh_v1
+        if v != e.v2
+            push!(neighbors, SimpleEdge(e.v1, v))
+        end
+    end
+
+    for v in neigh_v2
+        if v != e.v1
+            push!(neighbors, SimpleEdge(e.v2, v))
+        end
+    end
+
+    return neighbors
+end
+
+vertex_type(::SimpleNetwork{T}) where {T} = T
+edge_type(::SimpleNetwork{T}) where {T} = SimpleEdge{T}
 
 hasvertex(g::SimpleNetwork, v) = 1 <= v <= length(g.fadjlist)
 hasedge(g::SimpleNetwork, e::SimpleEdge) = e.v2 ∈ g.fadjlist[e.v1]

@@ -35,6 +35,30 @@ all_edges(graph::IncidentNetwork) = keys(graph.edgemap)
 edge_incidents(graph::IncidentNetwork, e) = graph.edgemap[e]
 vertex_incidents(graph::IncidentNetwork, v) = graph.vertexmap[v]
 
+function vertex_neighbors(graph::IncidentNetwork, v)
+    neighbors = Set{typeof(v)}()
+    for edge in vertex_incidents(graph, v)
+        for neighbor in edge_incidents(graph, edge)
+            if neighbor != v
+                push!(neighbors, neighbor)
+            end
+        end
+    end
+    return neighbors
+end
+
+function edge_neighbors(graph::IncidentNetwork, e)
+    neighbors = Set{typeof(e)}()
+    for vertex in edge_incidents(graph, e)
+        for neighbor in vertex_incidents(graph, vertex)
+            if neighbor != e
+                push!(neighbors, neighbor)
+            end
+        end
+    end
+    return neighbors
+end
+
 vertex_type(::IncidentNetwork{V,E}) where {V,E} = V
 edge_type(::IncidentNetwork{V,E}) where {V,E} = E
 
