@@ -59,8 +59,11 @@ function edge_neighbors(graph::IncidentNetwork, e)
     return neighbors
 end
 
-vertex_type(::IncidentNetwork{V,E}) where {V,E} = V
-edge_type(::IncidentNetwork{V,E}) where {V,E} = E
+vertex_type(::N) where {N<:IncidentNetwork} = vertex_type(N)
+edge_type(::N) where {N<:IncidentNetwork} = edge_type(N)
+
+vertex_type(::Type{IncidentNetwork{V,E}}) where {V,E} = V
+edge_type(::Type{IncidentNetwork{V,E}}) where {V,E} = E
 
 hasvertex(graph::IncidentNetwork, v) = haskey(graph.vertexmap, v)
 hasedge(graph::IncidentNetwork, e) = haskey(graph.edgemap, e)

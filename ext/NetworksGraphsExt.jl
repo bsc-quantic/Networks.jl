@@ -27,9 +27,9 @@ Networks.edge(e::SimpleAdaptedEdge) = e.network_edge
 # `T` is the Graphs.jl vertex type, `V` is the Networks.jl vertex type
 const GraphVertexBijection{T,V} = Bijection{T,V,Dict{T,V},Dict{V,T}}
 
-struct GraphsAdaptorNetwork{T<:Integer,N<:AbstractNetwork} <: Graphs.AbstractGraph{T}
+struct GraphsAdaptorNetwork{T<:Integer,N<:AbstractNetwork,V} <: Graphs.AbstractGraph{T}
     network::N
-    vertexmap::GraphVertexBijection{T,vertex_type(N)}
+    vertexmap::GraphVertexBijection{T,V}
 
     # TODO assert no hyperedges
 end
@@ -38,7 +38,8 @@ function GraphsAdaptorNetwork{T}(g::AbstractNetwork) where {T}
     vertexmap = GraphVertexBijection{T,vertex_type(g)}(
         Dict{T,vertex_type(g)}(i => v for (i, v) in enumerate(vertices(g)))
     )
-    return GraphsAdaptorNetwork{T,typeof(g)}(g, vertexmap)
+    @show vertex_type(g) typeof(vertexmap)
+    return GraphsAdaptorNetwork{T,typeof(g),vertex_type(g)}(g, vertexmap)
 end
 
 GraphsAdaptorNetwork(g::AbstractNetwork, T=Int) = GraphsAdaptorNetwork{T}(g)
@@ -47,6 +48,10 @@ Base.convert(::Type{Graphs.AbstractGraph{T}}, g::AbstractNetwork) where {T} = Gr
 
 ## `Network` interface implementation
 DelegatorTraits.DelegatorTrait(::Networks.Network, ::GraphsAdaptorNetwork) = DelegatorTraits.DelegateToField{:network}()
+
+# override to avoid infinite recursion
+Networks.nvertices(g::GraphsAdaptorNetwork) = nvertices(g.network)
+Networks.nedges(g::GraphsAdaptorNetwork) = nedges(g.network)
 
 ## `AbstractGraph` interface implementation
 Base.eltype(::Type{GraphsAdaptorNetwork{T}}) where {T} = T
@@ -59,7 +64,7 @@ Graphs.vertices(g::GraphsAdaptorNetwork) = collect(keys(g.vertexmap))
 Graphs.has_vertex(g::GraphsAdaptorNetwork, v) = haskey(g.vertexmap, v)
 
 function Graphs.edges(g::GraphsAdaptorNetwork)
-    map(all_edges(g)) do e
+    Iterators.map(all_edges(g)) do e
         src, dst = edge_incidents(g, e)
         SimpleAdaptedEdge{eltype(g),edge_type(g)}(g.vertexmap(src), g.vertexmap(dst), e)
     end
@@ -79,6 +84,10 @@ function Graphs.inneighbors(g::GraphsAdaptorNetwork, v)
         push!(neighbors, g.vertexmap(src))
         push!(neighbors, g.vertexmap(dst))
     end
+
+    # remove itself
+    # TODO keep it if self-loop?
+    delete!(neighbors, v)
     return neighbors
 end
 

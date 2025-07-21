@@ -24,7 +24,7 @@ g = convert(Graphs.AbstractGraph{Int}, network)
 @test Graphs.nv(g) == 3
 @test Graphs.ne(g) == 3
 
-@test issetequal(vertices(g), [:a, :b, :c])
+@test issetequal(all_vertices(g), [:a, :b, :c])
 @test issetequal(Graphs.vertices(g), [1, 2, 3])
 @test Graphs.has_vertex(g, 1)
 @test Graphs.has_vertex(g, 2)
