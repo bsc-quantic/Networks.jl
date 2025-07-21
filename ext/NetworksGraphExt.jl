@@ -43,6 +43,8 @@ end
 
 GraphsAdaptorNetwork(g::AbstractNetwork, T=Int) = GraphsAdaptorNetwork{T}(g)
 
+Base.convert(::Type{AbstractGraph{T}}, g::AbstractNetwork) where {T} = GraphsAdaptorNetwork{T}(g)
+
 ## `Network` interface implementation
 DelegatorTraits.DelegatorTrait(::Networks.Network, ::GraphsAdaptorNetwork) = DelegatorTraits.DelegateToField{:network}()
 
