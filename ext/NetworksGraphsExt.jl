@@ -27,7 +27,7 @@ Networks.edge(e::SimpleAdaptedEdge) = e.network_edge
 # `T` is the Graphs.jl vertex type, `V` is the Networks.jl vertex type
 const GraphVertexBijection{T,V} = Bijection{T,V,Dict{T,V},Dict{V,T}}
 
-struct GraphsAdaptorNetwork{T<:Integer,N<:AbstractNetwork} <: AbstractGraph{T}
+struct GraphsAdaptorNetwork{T<:Integer,N<:AbstractNetwork} <: Graphs.AbstractGraph{T}
     network::N
     vertexmap::GraphVertexBijection{T,vertex_type(N)}
 
@@ -43,7 +43,7 @@ end
 
 GraphsAdaptorNetwork(g::AbstractNetwork, T=Int) = GraphsAdaptorNetwork{T}(g)
 
-Base.convert(::Type{AbstractGraph{T}}, g::AbstractNetwork) where {T} = GraphsAdaptorNetwork{T}(g)
+Base.convert(::Type{Graphs.AbstractGraph{T}}, g::AbstractNetwork) where {T} = GraphsAdaptorNetwork{T}(g)
 
 ## `Network` interface implementation
 DelegatorTraits.DelegatorTrait(::Networks.Network, ::GraphsAdaptorNetwork) = DelegatorTraits.DelegateToField{:network}()
