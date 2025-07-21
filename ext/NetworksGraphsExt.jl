@@ -82,6 +82,6 @@ function Graphs.inneighbors(g::GraphsAdaptorNetwork, v)
     return neighbors
 end
 
-Base.zero(::Type{GraphsAdaptorNetwork{T,N}}) = GraphsAdaptorNetwork{T}(N())
+Base.zero(::Type{GraphsAdaptorNetwork{T,N}}) where {T,N} = GraphsAdaptorNetwork{T}(N())
 
 end
