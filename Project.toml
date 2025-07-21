@@ -10,6 +10,9 @@ DelegatorTraits = "d83dbd90-3e00-4b33-84f1-398adcf3b35e"
 [weakdeps]
 Graphs = "86223c79-3864-5bf0-83f7-82e725a168b6"
 
+[extensions]
+NetworksGraphsExt = "Graphs"
+
 [compat]
 Bijections = "0.2.2"
 DelegatorTraits = "0.1.2"
