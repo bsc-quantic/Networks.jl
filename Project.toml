@@ -4,8 +4,14 @@ authors = ["Sergio Sánchez Ramírez <sergio.sanchez.ramirez+git@bsc.es>"]
 version = "0.3.1"
 
 [deps]
+Bijections = "e2ed5e7c-b2de-5872-ae92-c73ca462fb04"
 DelegatorTraits = "d83dbd90-3e00-4b33-84f1-398adcf3b35e"
 
+[weakdeps]
+Graphs = "86223c79-3864-5bf0-83f7-82e725a168b6"
+
 [compat]
+Bijections = "0.2.2"
 DelegatorTraits = "0.1.2"
+Graphs = "1.13.0"
 julia = "1.10"
