@@ -72,6 +72,9 @@ end
 
 # TODO should we also check that `src` and `dst` are valid vertices?
 Graphs.has_edge(g::GraphsAdaptorNetwork, e::SimpleAdaptedEdge) = hasedge(g, edge(e))
+function Graphs.has_edge(g::GraphsAdaptorNetwork, src, dst)
+    !isempty(vertex_incidents(g, g.vertexmap[src]) ∩ vertex_incidents(g, g.vertexmap[dst]))
+end
 
 # TODO fix when directedness arrives
 Graphs.is_directed(g::GraphsAdaptorNetwork) = false
