@@ -1,4 +1,4 @@
-module NetworksGraphExt
+module NetworksGraphsExt
 
 using Networks
 using Networks: AbstractNetwork
