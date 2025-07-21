@@ -9,4 +9,6 @@ using SafeTestsets
     @safetestset "Cycles" include("unit/cycles.jl")
 end
 
-@testset "Integration" verbose = true begin end
+@testset "Integration" verbose = true begin
+    @safetestset "Graphs" include("integration/graphs.jl")
+end
