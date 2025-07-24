@@ -10,17 +10,19 @@ Using [`DelegatorTraits.jl`](https://github.com/bsc-quantic/DelegatorTraits.jl) 
 
 ## Network
 
-The `Network` interface abstracts a network or graph as a bipartite graph whose sets are the vertices and the edges.
+The `Network` interface abstracts a network or graph. Unlike other graph interfaces, `Network` considers edges as first-class objects and not just as
+relations of vertices. This allows for a more relaxed abstraction where self-loops, open-edges, multi-edges and hyper-edges are allowed.
 A type implementing the `Network` interface must implement the following methods:
 
-| Required method          | Description                                 |
-| :----------------------- | :------------------------------------------ |
-| `all_vertices(g)`        | Returns the list of vertices                |
-| `all_edges(g)`           | Returns the list of edges                   |
-| `edge_incidents(g, e)`   | Returns the vertices connected by edge `e`  |
-| `vertex_incidents(g, v)` | Returns the edges conected to vertex `v`    |
-| `vertex_neighbors(g, v)` | Returns the vertices neighboring vertex `v` |
-| `edge_neighbors(g, e)`   | Returns the edges neighboring edge `e`      |
+| Required method           | Description                                      |
+| :------------------------ | :----------------------------------------------- |
+| `all_vertices(g)`         | Returns the list of vertices                     |
+| `all_edges(g)`            | Returns the list of edges                        |
+| `incident_vertices(g, e)` | Returns the vertices connected by edge `e`       |
+| `incident_edges(g, v)`    | Returns the edges conected to vertex `v`         |
+| `neighbor_vertices(g, v)` | Returns the vertices neighboring vertex `v`      |
+| `neighbor_edges(g, e)`    | Returns the edges neighboring edge `e`           |
+| `Directedness(::Type{G})` | Returns the directedness trait of graph type `G` |
 
 ### Optional methods
 
@@ -36,6 +38,23 @@ The following methods have a default implementation or their implementation is o
 | `nedges(g)`         | If there is a more performant way                    | `length(edges(g))`    | Returns the number of edges present in the network     |
 | `vertex_at(g, tag)` | If your type has some other way to refer to a vertex | _(undefined)_         | Returns the vertex related to `tag`                    |
 | `edge_at(g, tag)`   | If your type has some other way to refer to an edge  | _(undefined)_         | Returns the edge related to `tag`                      |
+
+### Directed methods
+
+If your `Network` implementation represents a directed graph, the following methods are required:
+
+!!! warning
+
+    Directedness on hypergraphs is not well-defined. It is such an edge case, that we have decide to don't support it explicitly for the time being.
+
+| Required method              | Description                                       |
+| :--------------------------- | :------------------------------------------------ |
+| `incoming_edges(g, v)`       | Returns the edges incoming to vertex `v`          |
+| `outgoing_edges(g, v)`       | Returns the vertices outgoing from vertex `v`     |
+| `source_vertex(g, e)`        | Returns the source vertex of edge `e`             |
+| `destination_vertex(g, e)`   | Returns the destination vertex of edge `e`        |
+| `predecessor_vertices(g, v)` | Returns the vertices that are predecessors of `v` |
+| `successor_vertices(g, v)`   | Returns the vertices that are successors of `v`   |
 
 ### Mutating methods
 

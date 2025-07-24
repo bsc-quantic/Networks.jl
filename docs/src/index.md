@@ -53,14 +53,14 @@ Networks.link!(g, :b, 1)
 Networks.link!(g, :c, 1)
 ```
 
-In order to query the vertices connected by an edge, use `edge_incidents`:
+In order to query the vertices connected by an edge, use `incident_vertices`:
 
 ```@repl example
-edge_incidents(g, 1)
+incident_vertices(g, 1)
 ```
 
-... and to query the edges connected to a vertex, use `edge_incidents`:
+... and to query the edges connected to a vertex, use `incident_vertices`:
 
 ```@repl example
-vertex_incidents(g, :a)
+incident_edges(g, :a)
 ```

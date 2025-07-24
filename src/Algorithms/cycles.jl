@@ -17,7 +17,7 @@ function cycle_basis(g, root=nothing)
         while !isempty(stack)
             z = pop!(stack)
             zused = used[z]
-            for nbr in vertex_neighbors(g, z)
+            for nbr in neighbor_vertices(g, z)
                 if !in(nbr, keys_used)
                     pred[nbr] = z
                     push!(keys_pred, nbr)

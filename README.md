@@ -70,20 +70,20 @@ julia> Networks.link!(g, :b, 1);
 julia> Networks.link!(g, :c, 1);
 ```
 
-In order to query the vertices connected by an edge, use `edge_incidents`:
+In order to query the vertices connected by an edge, use `incident_vertices`:
 
 ```julia
-julia> edge_incidents(g, 1)
+julia> incident_vertices(g, 1)
 Set{Symbol} with 3 elements:
   :a
   :b
   :c
 ```
 
-... and to query the edges connected to a vertex, use `vertex_incidents`:
+... and to query the edges connected to a vertex, use `incident_edges`:
 
 ```julia
-julia> vertex_incidents(g, :a)
+julia> incident_edges(g, :a)
 Set{Int64} with 1 element:
   1
 ```

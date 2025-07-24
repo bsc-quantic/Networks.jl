@@ -32,13 +32,13 @@ all_vertices(graph::IncidentNetwork) = keys(graph.vertexmap)
 all_edges(graph::IncidentNetwork) = keys(graph.edgemap)
 
 # TODO should we copy the sets to avoid accidental mutation?
-edge_incidents(graph::IncidentNetwork, e) = graph.edgemap[e]
-vertex_incidents(graph::IncidentNetwork, v) = graph.vertexmap[v]
+incident_vertices(graph::IncidentNetwork, e) = graph.edgemap[e]
+incident_edges(graph::IncidentNetwork, v) = graph.vertexmap[v]
 
-function vertex_neighbors(graph::IncidentNetwork, v)
+function neighbor_vertices(graph::IncidentNetwork, v)
     neighbors = Set{typeof(v)}()
-    for edge in vertex_incidents(graph, v)
-        for neighbor in edge_incidents(graph, edge)
+    for edge in incident_edges(graph, v)
+        for neighbor in incident_vertices(graph, edge)
             if neighbor != v
                 push!(neighbors, neighbor)
             end
@@ -47,10 +47,10 @@ function vertex_neighbors(graph::IncidentNetwork, v)
     return neighbors
 end
 
-function edge_neighbors(graph::IncidentNetwork, e)
+function neighbor_edges(graph::IncidentNetwork, e)
     neighbors = Set{typeof(e)}()
-    for vertex in edge_incidents(graph, e)
-        for neighbor in vertex_incidents(graph, vertex)
+    for vertex in incident_vertices(graph, e)
+        for neighbor in incident_edges(graph, vertex)
             if neighbor != e
                 push!(neighbors, neighbor)
             end
@@ -109,11 +109,11 @@ end
 
 # TODO parameterize `EdgePersistence` to allow for different edge persistence strategies
 function rmvertex!(graph::IncidentNetwork, vertex)
-    # isempty(vertex_incidents(graph, vertex)) || throw(ArgumentError("Vertex $vertex is incident to edges. Unlink edges first."))
+    # isempty(incident_edges(graph, vertex)) || throw(ArgumentError("Vertex $vertex is incident to edges. Unlink edges first."))
     hasvertex(graph, vertex) || throw(ArgumentError("Vertex $vertex does not exist in the graph"))
 
     # unlink vertex-edge pairs
-    for edge in vertex_incidents(graph, vertex)
+    for edge in incident_edges(graph, vertex)
         unlink!(graph, vertex, edge)
     end
 
@@ -130,11 +130,11 @@ function addedge!(graph::IncidentNetwork{V,E}, edge) where {V,E}
 end
 
 function rmedge!(graph::IncidentNetwork, edge)
-    # isempty(edge_incidents(graph, edge)) || throw(ArgumentError("Edge $edge is incident to vertices. Unlink vertices first."))
+    # isempty(incident_vertices(graph, edge)) || throw(ArgumentError("Edge $edge is incident to vertices. Unlink vertices first."))
     hasedge(graph, edge) || throw(ArgumentError("Edge $edge does not exist in the graph"))
 
     # unlink edge-vertex pairs
-    for vertex in edge_incidents(graph, edge)
+    for vertex in incident_vertices(graph, edge)
         unlink!(graph, vertex, edge)
     end
 
