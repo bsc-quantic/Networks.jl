@@ -4,6 +4,9 @@
 [![Documentation: stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://bsc-quantic.github.io/Networks.jl/)
 [![Documentation: dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://bsc-quantic.github.io/Networks.jl/dev/)
 
+> [!IMPORTANT]
+> Development continues in [mofeing/Networks.jl](https://github.com/mofeing/Networks.jl).
+
 > [!WARNING]
 >  Networks.jl is still experimental, and the API can change. 
 
